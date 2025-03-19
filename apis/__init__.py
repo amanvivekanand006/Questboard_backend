@@ -1,5 +1,5 @@
 import fastapi
-import pymongo
+from pymongo import MongoClient
 from pydantic import BaseModel
 from typing import Optional
 from fastapi.routing import APIRouter
