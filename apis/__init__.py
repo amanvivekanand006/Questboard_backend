@@ -4,6 +4,8 @@ from pydantic import BaseModel,EmailStr,Field
 from typing import Optional,List
 from fastapi.routing import APIRouter
 import uuid
+from fastapi.middleware.cors import CORSMiddleware
+
 
 api_router = APIRouter()
 
