@@ -32,9 +32,14 @@ class user_registration(BaseModel):
 @api_router.post("/user_registration", operation_id="creating_user_account")
 def create_user(userschema: user_registration):
     response = userschema.dict()
-    result = user_collection.insert_one(response)  # result is an InsertOneResult
-    user_id = str(result.inserted_id)  # Convert the inserted_id to a string
-    return {"message": "User created successfully", "user_id": user_id}
+    existing_user = user_collection.find_one({"email":response['email']},{"user_id":response['user_id']})
+    if existing_user:
+    
+       raise HTTPException(status_code=400,detail=f"User  already exists")
+    else:
+        result = user_collection.insert_one(response)  # result is an InsertOneResult
+        user_id = str(result.inserted_id)  # Convert the inserted_id to a string
+        return {"message": "User created successfully", "user_id": user_id}
 
 @api_router.post("/create_admin")
 async def create_admin(admin: createadmin):
