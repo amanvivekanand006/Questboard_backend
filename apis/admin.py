@@ -77,4 +77,10 @@ async def delete_admin(admin_id:str):
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Admin not found")
     return {"message":"admin deleted successfully"}
-    
+
+@api_router.get("/fetch_users")
+async def fetch_users():
+    users = list(user_collection.find())
+    for user in users:
+        user.pop("_id")
+    return users
