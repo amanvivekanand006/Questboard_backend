@@ -33,37 +33,6 @@ class user_registration(BaseModel):
 
 
 
-@api_router.post("/user_registration", operation_id="creating_user_account", tags=["Admin and Users"])
-def create_user(userschema: user_registration):
-    response = userschema.dict()
-    generated_user_id = generate_user_id()
-    response.update({
-        "user_id": generated_user_id
-    })
-    
-    # Check if user exists with email
-    existing_user = user_collection.find_one({"email": response['email']})
-    
-    if existing_user:
-        # Convert existing user document to dictionary
-        complete_user_details = dict(existing_user)
-        complete_user_details['_id'] = str(complete_user_details['_id'])
-        
-        # Return both minimal and complete user details
-        return {
-            "message": "User already exists",
-            "user_details": {
-                "user_id": existing_user["user_id"]
-            },
-            "complete_user_details": complete_user_details
-        }
-    else:
-        result = user_collection.insert_one(response)
-        inserted_id = str(result.inserted_id)
-        return {
-            "message": "User created successfully",
-            "user_id": generated_user_id
-        }
 @api_router.post("/create_admin", operation_id="creating_admin_for_application" , tags=["Admin and Users"])
 async def create_admin(admin: createadmin):
     admin_dict = admin.dict() 
@@ -104,20 +73,3 @@ async def delete_admin(admin_id:str):
         raise HTTPException(status_code=404, detail="Admin not found")
     return {"message":"admin deleted successfully"}
 
-@api_router.get("/fetch_users")
-async def fetch_users():
-    users = list(user_collection.find())
-    for user in users:
-        user.pop("_id")
-    return users
-
-
-@api_router.get("/user_details")
-async def fetch_user(user_id: str):
-    User = user_collection.find_one({"user_id":user_id})
-    if not User:
-        raise HTTPException(status_code=404, detail="User not found")
-    else:
-       User.pop("_id", None)
-    
-       return User
