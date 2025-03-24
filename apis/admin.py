@@ -22,17 +22,6 @@ class createadmin(adminbase):
 class admin(adminbase):
     admin_id : str = Field(default_factory=generate_admin_id)
 
-class user_registration(BaseModel):
-    username: str
-    email: EmailStr
-    profile_pic: str
-    xp : int = Field(default = 0)
-    coins : int
-    level : int
-    badges : List[str] = []
-
-
-
 @api_router.post("/create_admin", operation_id="creating_admin_for_application" , tags=["Admin and Users"])
 async def create_admin(admin: createadmin):
     admin_dict = admin.dict() 
