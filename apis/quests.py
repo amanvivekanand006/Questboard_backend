@@ -1,4 +1,7 @@
+from pymongo import DESCENDING
 from . import *
+from .Users import user_collection
+
 
 client = MongoClient(mongo_uri)
 db = client["questboard"]
@@ -15,6 +18,9 @@ class Quest_schema(BaseModel):
 
 def get_ups(quest):
     return quest["Ups"]
+
+def create_time(quest):
+    return quest["creation_date"]
 
 def generate_quest_id():
     id = f"QUID{random.randint(10000000,99999999)}"
@@ -119,5 +125,31 @@ async def trending_quests():
         "trending_quests": trending
     }
 
+@api_router.get("/fetch_recent quest")
+async def newly_added():
+    newquests = quest_collection.find().sort("creation_date", DESCENDING)
+  
+    newquests = list(newquests)
 
+    for quest in newquests:
+        quest.pop('_id')
+    return newquests
+        
+@api_router.get("/fetch_followerquest")
+async def following_quests(user_id:str):
+    User = user_collection.find_one({"user_id":user_id})
+
+    followings = User.get("following",[])
+    all_quests = []
+    for following in followings:
+        
+        following_quest = list(quest_collection.find({"user_id":following}))
+    
+        for quest in following_quest:
+            quest.pop("_id")
+            all_quests.append(quest)
+    return all_quests
+
+        
+     
 
